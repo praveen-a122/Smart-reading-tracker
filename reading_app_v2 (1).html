@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Reading Tracker — Session</title>
+<style>
+  :root {
+    --bg: #faf8f3;
+    --ink: #2b2a28;
+    --muted: #7a766c;
+    --accent: #b5532f;
+    --accent-soft: #f3e6dd;
+    --line: #e3ddd2;
+    --panel: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+  }
+
+  header {
+    padding: 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+
+  header h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: 0.02em; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+  #participant-box {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #participant-box label { font-size: 13px; color: var(--muted); }
+  #participant-box input {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 160px;
+  }
+
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 36px 24px 140px;
+  }
+
+  .doc-title { font-size: 26px; margin-bottom: 24px; }
+
+  p.reading-para {
+    font-size: 19px;
+    margin: 0 0 14px;
+    padding: 4px 0;
+    border-radius: 4px;
+    transition: background 0.4s ease;
+  }
+
+  p.reading-para.active { background: rgba(181, 83, 47, 0.05); }
+
+  /* Intervention banner */
+  .intervention {
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 0 0 14px;
+    display: none;
+    animation: fade-in 0.3s ease;
+  }
+
+  .intervention.show { display: block; }
+
+  .intervention .label {
+    font-weight: bold;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .intervention .content { color: var(--ink); line-height: 1.6; }
+
+  .intervention .actions { margin-top: 8px; }
+
+  .intervention .dismiss {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-right: 6px;
+  }
+
+  .intervention .dismiss:hover { background: var(--accent); color: white; }
+  .intervention .dismiss.chosen { background: var(--accent); color: white; }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Quick-check block after each paragraph */
+  .quick-check {
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin: 0 0 36px;
+  }
+
+  .quick-check .qc-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .scale-row { margin-bottom: 12px; }
+  .scale-row .scale-label { display: block; font-size: 13px; margin-bottom: 6px; }
+  .scale { display: flex; gap: 6px; max-width: 320px; }
+  .scale label {
+    flex: 1; text-align: center; border: 1px solid var(--line);
+    border-radius: 4px; padding: 5px 0; font-size: 13px; cursor: pointer;
+  }
+  .scale input { display: none; }
+  .scale label:has(input:checked) { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .scale-endpoints {
+    display: flex;
+    justify-content: space-between;
+    max-width: 320px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .quiz-row .q-text { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+  .quiz-options label {
+    display: block; padding: 5px 10px; border: 1px solid var(--line);
+    border-radius: 4px; margin-bottom: 5px; font-size: 13px; cursor: pointer;
+  }
+  .quiz-options label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+
+  /* Status bar */
+  #status-panel {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--ink); color: #fff;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    font-size: 12px; padding: 10px 20px;
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap; z-index: 50;
+  }
+  #status-panel .stat { display: flex; flex-direction: column; }
+  #status-panel .stat span:first-child { color: #b9b5ab; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  #status-panel .stat span:last-child { font-size: 14px; font-weight: bold; }
+  #status-panel button {
+    margin-left: auto; background: var(--accent); color: #fff; border: none;
+    padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  #status-panel button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Finish overlay */
+  #finish-overlay {
+    position: fixed; inset: 0; background: rgba(43,42,40,0.55);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  #finish-overlay.show { display: flex; }
+  .panel { background: var(--panel); max-width: 480px; width: 92%; border-radius: 8px; padding: 28px 32px; text-align: center; }
+  .panel h2 { margin-top: 0; font-family: Georgia, serif; }
+  #download-link a {
+    display: inline-block; margin-top: 14px; background: var(--accent); color: #fff;
+    padding: 10px 20px; border-radius: 4px; text-decoration: none; font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Smart Reading Tracker — Reading Session</h1>
+  <p>Read the passage below at your normal pace. Keep your mouse on the screen as you read.
+  After each paragraph, a short check appears — answer it before moving to the next paragraph.</p>
+  <div id="participant-box">
+    <label for="pid">Participant ID:</label>
+    <input type="text" id="pid" placeholder="e.g. P07" />
+  </div>
+</header>
+
+<main>
+  <div class="doc-title">How Coral Reefs Build Themselves</div>
+  <div id="reading-container"></div>
+</main>
+
+<div id="status-panel">
+  <div class="stat"><span>Current paragraph</span><span id="stat-para">—</span></div>
+  <div class="stat"><span>Dwell time (s)</span><span id="stat-dwell">0</span></div>
+  <div class="stat"><span>Reread count</span><span id="stat-reread">0</span></div>
+  <div class="stat"><span>Struggle score</span><span id="stat-struggle">0.00</span></div>
+  <button id="finish-btn" disabled>Finish & download data</button>
+</div>
+
+<div id="finish-overlay">
+  <div class="panel">
+    <h2>Thanks!</h2>
+    <p>Your session data has been prepared.</p>
+    <div id="download-link"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // =====================================================================
+  // CONTENT — paragraphs, quiz questions, and intervention content.
+  // Edit this section to use a different document.
+  // =====================================================================
+  const PARAGRAPHS = [
+    {
+      text: `Coral reefs are often described as the rainforests of the sea, and the comparison
+      holds up well. A single reef can host thousands of species, from tiny shrimp to
+      large predatory fish, all depending on the same structure for food and shelter.
+      What looks like a rock formation is, in fact, made by living animals working
+      together over very long stretches of time.`,
+      words: 62,
+      quiz: {
+        question: "According to this paragraph, what is a coral reef mainly built by?",
+        options: [
+          { text: "Living animals working together over a long time", correct: true },
+          { text: "Volcanic rock formations", correct: false },
+          { text: "Sand and coral fragments washed ashore", correct: false },
+        ],
+      },
+    },
+    {
+      text: `The animals responsible are coral polyps, small soft-bodied organisms related to
+      sea anemones. Each polyp builds a hard skeleton of calcium carbonate around itself.
+      When thousands of polyps grow side by side and their skeletons fuse together, the
+      result is the solid reef structure that boats and divers can see from a distance.`,
+      words: 58,
+      quiz: {
+        question: "What do coral polyps build around themselves?",
+        options: [
+          { text: "A hard skeleton made of calcium carbonate", correct: true },
+          { text: "A soft shell made of algae", correct: false },
+          { text: "A net of fibers used to catch food", correct: false },
+        ],
+      },
+    },
+    {
+      text: `What makes this process unusually efficient is a partnership between the coral
+      polyp and a microscopic algae called zooxanthellae, which live inside the polyp's
+      tissue. The algae perform photosynthesis and pass a large share of the resulting
+      sugars to the coral, while the coral provides the algae with a protected
+      environment and a steady supply of carbon dioxide. This exchange allows reefs to
+      grow in waters that would otherwise be too nutrient-poor to support such dense
+      animal life, which is part of why reefs are often called an ecological paradox —
+      enormous productivity in what should be a biological desert.`,
+      words: 91,
+      quiz: {
+        question: "What do zooxanthellae give to the coral?",
+        options: [
+          { text: "Sugars produced through photosynthesis", correct: true },
+          { text: "Extra oxygen only", correct: false },
+          { text: "A hard protective shell", correct: false },
+        ],
+      },
+    },
+    {
+      text: `Reef growth is slow by human standards. Many reef-building corals add only a few
+      centimetres to their skeletons each year, and a large reef structure may represent
+      thousands of years of continuous growth. Because of this slow pace, damage from
+      storms, disease, or rising water temperatures can take decades to repair, even
+      when the surrounding conditions return to normal fairly quickly.`,
+      words: 70,
+      quiz: {
+        question: "Why can reef damage take decades to repair?",
+        options: [
+          { text: "Because reef-building corals grow only a few centimetres per year", correct: true },
+          { text: "Because reefs only grow at night", correct: false },
+          { text: "Because algae take decades to reproduce", correct: false },
+        ],
+      },
+    },
+    {
+      text: `Temperature is one of the most important factors in this relationship, and it is
+      also the most fragile part of it. When water becomes too warm, the coral expels
+      its zooxanthellae, losing both its colour and its main energy source — a process
+      known as coral bleaching. A bleached coral is not dead, but it is under severe
+      stress, and if warm conditions persist for too long, the coral will eventually
+      starve. Because the entire reef depends on this single partnership repeating
+      successfully across millions of polyps, even a small shift in average temperature
+      can affect an enormous structure.`,
+      words: 84,
+      quiz: {
+        question: "What happens during coral bleaching?",
+        options: [
+          { text: "The coral expels its algae and loses colour and energy", correct: true },
+          { text: "The coral grows a new, harder skeleton", correct: false },
+          { text: "The reef's water temperature drops suddenly", correct: false },
+        ],
+      },
+    },
+  ];
+
+  // Hand-written intervention content per paragraph per arm.
+  // In a full deployment, generate these via an LLM API call instead.
+  const INTERVENTIONS = [
+    { // paragraph 0
+      A_definition: { label: "Word help",
+        content: `"Predatory" means an animal that hunts and eats other animals.` },
+      B_summary: { label: "Simple summary",
+        content: `Coral reefs are like underwater rainforests — many different sea creatures live together and depend on the same reef structure for food and shelter.` },
+      C_rephrase: { label: "Simplified version",
+        content: `Coral reefs are a lot like rainforests in the ocean. A reef can be home to thousands of different animals, from small shrimp to big fish that hunt other animals. All of these animals need the reef for food and a place to live. Even though a reef looks like a rock, it is actually built by living animals over a very long time.` },
+      D_analogy: { label: "Analogy",
+        content: `Think of a coral reef like an apartment building constructed slowly, brick by brick, by its own residents — and now thousands of different "tenants" live in it.` },
+    },
+    { // paragraph 1
+      A_definition: { label: "Word help",
+        content: `"Polyps" are tiny, soft-bodied sea animals related to anemones. "Calcium carbonate" is a hard mineral — the same substance found in chalk and seashells.` },
+      B_summary: { label: "Simple summary",
+        content: `Tiny animals called coral polyps build hard skeletons around themselves, and when many grow together, their skeletons join to form the reef.` },
+      C_rephrase: { label: "Simplified version",
+        content: `Coral polyps are small, soft animals related to sea anemones. Each one builds a hard, shell-like skeleton around its body using a mineral called calcium carbonate — the same material found in chalk and seashells. When thousands of these polyps grow next to each other, their skeletons join together. This is what forms the solid reef you can see from a boat or while diving.` },
+      D_analogy: { label: "Analogy",
+        content: `It's a bit like thousands of people each building a tiny brick room right next to their neighbour's — eventually, all those rooms connect into one giant structure.` },
+    },
+    { // paragraph 2 (hardest)
+      A_definition: { label: "Word help",
+        content: `"Zooxanthellae" are tiny algae living inside coral that make food using sunlight. "Photosynthesis" is how plants and algae turn sunlight into food. An "ecological paradox" is something that seems impossible because the environment shouldn't support so much life — but it does.` },
+      B_summary: { label: "Simple summary",
+        content: `Coral and a type of algae living inside it help each other: the algae make food from sunlight and share it with the coral, while the coral protects the algae. This partnership lets reefs thrive even in waters with very few nutrients.` },
+      C_rephrase: { label: "Simplified version",
+        content: `Coral works closely with a tiny algae called zooxanthellae that lives inside its body. The algae use sunlight to make food — a process called photosynthesis — and give most of that food to the coral. In return, the coral gives the algae a safe place to live and a steady supply of carbon dioxide, which the algae need. Because of this teamwork, reefs can grow in ocean water that doesn't have many nutrients — water that normally couldn't support so much life. This is why people sometimes call reefs a "puzzle of nature": huge amounts of life growing in what should be an empty environment.` },
+      D_analogy: { label: "Analogy",
+        content: `It's similar to a tenant (the algae) who cooks meals using sunlight from a window and shares the food with the landlord (the coral), in exchange for free rent and protection — both benefit, and neither would do as well alone.` },
+    },
+    { // paragraph 3
+      A_definition: { label: "Word help",
+        content: `"Reef-building corals" are the species of coral that grow hard skeletons and form reefs (as opposed to soft corals, which don't).` },
+      B_summary: { label: "Simple summary",
+        content: `Coral reefs grow very slowly — often just a few centimetres a year — so damage from storms or warming water can take decades to heal.` },
+      C_rephrase: { label: "Simplified version",
+        content: `Reefs grow very slowly compared to how we usually think about growth. Many corals add only a few centimetres to their skeleton each year. Because of this slow pace, a large reef structure might represent thousands of years of growth. If a storm, disease, or warm water damages the reef, it can take many decades to recover — even after conditions go back to normal.` },
+      D_analogy: { label: "Analogy",
+        content: `It's like a tree that takes a hundred years to grow tall — if a storm snaps its branches, it won't grow back to that size in just a year or two, no matter how good the weather is afterward.` },
+    },
+    { // paragraph 4
+      A_definition: { label: "Word help",
+        content: `"Bleaching" is when coral turns white and loses its food source because it pushes out the algae living inside it due to heat stress. "Expels" means pushes out or gets rid of.` },
+      B_summary: { label: "Simple summary",
+        content: `When the ocean gets too warm, coral pushes out its algae partner, turns white, and loses its main source of food — a process called bleaching. If the heat continues too long, the coral can starve.` },
+      C_rephrase: { label: "Simplified version",
+        content: `Warm water is both very important to coral and very dangerous for it. If the water gets too hot, the coral pushes out the algae living inside it. This causes the coral to lose its colour and its main source of food — this is called coral bleaching. A bleached coral isn't dead yet, but it's in serious trouble. If the warm water lasts too long, the coral will eventually starve. Because every coral in a reef depends on this same partnership, even a small rise in average ocean temperature can damage a huge area of reef.` },
+      D_analogy: { label: "Analogy",
+        content: `It's like a person asking their roommate — who cooks all the meals — to leave because the apartment got too hot. They might survive a few days without food, but if the heat doesn't let up and they can't find another roommate, they'll eventually go hungry.` },
+    },
+  ];
+
+  // =====================================================================
+  // CONFIG
+  // =====================================================================
+  const IDLE_THRESHOLD_MS = 1500;
+  const STRUGGLE_THRESHOLD = 0.35;
+  const SCROLL_REREAD_PX = 50;
+  const BACKTRACK_PX = 30;
+  const FEATURE_UPDATE_MS = 1000;
+
+  // Intervention arms: 20% control (no help), 20% each of the 4 arms.
+  const ARMS = ["control", "A_definition", "B_summary", "C_rephrase", "D_analogy"];
+  function pickArm() {
+    return ARMS[Math.floor(Math.random() * ARMS.length)];
+  }
+
+  // =====================================================================
+  // BUILD DOM
+  // =====================================================================
+  const container = document.getElementById("reading-container");
+  PARAGRAPHS.forEach((p, i) => {
+    const para = document.createElement("p");
+    para.className = "reading-para";
+    para.id = "para-" + i;
+    para.dataset.words = p.words;
+    para.textContent = p.text.replace(/\s+/g, " ").trim();
+    container.appendChild(para);
+
+    const interv = document.createElement("div");
+    interv.className = "intervention";
+    interv.id = "intervention-" + i;
+    interv.innerHTML = `
+      <div class="label"></div>
+      <div class="content"></div>
+      <div class="actions">
+        <button class="dismiss" data-response="helpful">This helped</button>
+        <button class="dismiss" data-response="not_helpful">Not helpful</button>
+      </div>`;
+    container.appendChild(interv);
+
+    const check = document.createElement("div");
+    check.className = "quick-check";
+    check.id = "check-" + i;
+    check.innerHTML = `
+      <div class="qc-title">Quick check — paragraph ${i + 1}</div>
+      <div class="scale-row">
+        <span class="scale-label">How difficult was this paragraph to understand?</span>
+        <div class="scale">
+          ${[1,2,3,4,5].map(v => `<label><input type="radio" name="diff-${i}" value="${v}"><span>${v}</span></label>`).join("")}
+        </div>
+        <div class="scale-endpoints">
+          <span>1 = Very easy</span>
+          <span>5 = Very difficult</span>
+        </div>
+      </div>
+      <div class="quiz-row">
+        <div class="q-text">${p.quiz.question}</div>
+        <div class="quiz-options">
+          ${p.quiz.options.map((o, oi) => `
+            <label><input type="radio" name="quiz-${i}" value="${oi}" data-correct="${o.correct}"> ${o.text}</label>
+          `).join("")}
+        </div>
+      </div>`;
+    container.appendChild(check);
+  });
+
+  // =====================================================================
+  // STATE
+  // =====================================================================
+  const rawEvents = [];
+  const paraStats = {};
+  const interventionLog = {}; // paragraph_id -> { arm, accepted, struggle_type }
+  let sessionId = null;
+
+  const paragraphs = Array.from(document.querySelectorAll(".reading-para"));
+  paragraphs.forEach((el, i) => {
+    paraStats[i] = {
+      wordCount: parseInt(el.dataset.words, 10),
+      dwellMs: 0,
+      lastEnterTime: null,
+      rereadCount: 0,
+      backtrackCount: 0,
+      cursorStops: 0,
+      mouseSpeeds: [],
+    };
+  });
+
+  let mouseX = 0, mouseY = 0, lastMouseTime = Date.now();
+  let idleTimer = null;
+  let currentParaId = null;
+  let lastScrollY = window.scrollY;
+
+  // =====================================================================
+  // PARAGRAPH POSITION MAPPING
+  // =====================================================================
+  function getParaBounds(i) {
+    const el = paragraphs[i];
+    const top = el.offsetTop;
+    return { top, bottom: top + el.offsetHeight };
+  }
+
+  function getCurrentParagraph() {
+    const viewportMid = window.scrollY + window.innerHeight / 2;
+    for (let i = 0; i < paragraphs.length; i++) {
+      const { top, bottom } = getParaBounds(i);
+      if (viewportMid >= top && viewportMid < bottom) return i;
+    }
+    return null;
+  }
+
+  function logEvent(type, extra) {
+    rawEvents.push(Object.assign({
+      session_id: sessionId,
+      event_type: type,
+      paragraph_id: currentParaId,
+      timestamp: new Date().toISOString(),
+      scroll_y: window.scrollY,
+    }, extra));
+  }
+
+  function setActiveParagraph(newId) {
+    if (newId === currentParaId) return;
+    if (currentParaId !== null && paraStats[currentParaId].lastEnterTime !== null) {
+      const stats = paraStats[currentParaId];
+      stats.dwellMs += Date.now() - stats.lastEnterTime;
+      stats.lastEnterTime = null;
+      paragraphs[currentParaId].classList.remove("active");
+    }
+    currentParaId = newId;
+    if (currentParaId !== null) {
+      paraStats[currentParaId].lastEnterTime = Date.now();
+      paragraphs[currentParaId].classList.add("active");
+    }
+  }
+
+  // =====================================================================
+  // MOUSE / SCROLL / VISIBILITY TRACKING
+  // =====================================================================
+  document.addEventListener("mousemove", (e) => {
+    if (!sessionId) return;
+    const now = Date.now();
+    const dt = (now - lastMouseTime) / 1000;
+    const dx = e.clientX - mouseX;
+    const dy = e.clientY - mouseY;
+
+    if (currentParaId !== null && dt > 0) {
+      paraStats[currentParaId].mouseSpeeds.push(Math.sqrt(dx*dx + dy*dy) / dt);
+      if (dx < -BACKTRACK_PX) paraStats[currentParaId].backtrackCount++;
+    }
+
+    mouseX = e.clientX; mouseY = e.clientY; lastMouseTime = now;
+    logEvent("mousemove", { mouse_x: mouseX, mouse_y: mouseY });
+
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (currentParaId !== null) {
+        paraStats[currentParaId].cursorStops++;
+        logEvent("idle", { mouse_x: mouseX, mouse_y: mouseY });
+      }
+    }, IDLE_THRESHOLD_MS);
+  });
+
+  document.addEventListener("scroll", () => {
+    if (!sessionId) return;
+    const newScrollY = window.scrollY;
+
+    if (currentParaId !== null) {
+      const { top } = getParaBounds(currentParaId);
+      if (newScrollY < lastScrollY && (lastScrollY - newScrollY) > SCROLL_REREAD_PX && newScrollY <= top) {
+        paraStats[currentParaId].rereadCount++;
+      }
+    }
+
+    lastScrollY = newScrollY;
+    logEvent("scroll", { mouse_x: mouseX, mouse_y: mouseY });
+
+    const newPara = getCurrentParagraph();
+    if (newPara !== null) setActiveParagraph(newPara);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!sessionId) return;
+    logEvent(document.hidden ? "tab_hidden" : "tab_visible", {});
+  });
+
+  // =====================================================================
+  // STRUGGLE SCORE + INTERVENTIONS
+  // =====================================================================
+  function avg(arr) { return arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : 0; }
+
+  function computeFeatures(paraId) {
+    const s = paraStats[paraId];
+    const dwellSec = (s.dwellMs + (s.lastEnterTime ? Date.now() - s.lastEnterTime : 0)) / 1000;
+    const wpm = dwellSec > 0 ? (s.wordCount / dwellSec) * 60 : 999;
+
+    const dwellTerm = Math.min(dwellSec / 40, 1);
+    const rereadTerm = Math.min(s.rereadCount / 3, 1);
+    const backtrackTerm = Math.min(s.backtrackCount / 5, 1);
+    const stopTerm = Math.min(s.cursorStops / 4, 1);
+    const speedTerm = Math.max(0, 1 - wpm / 180);
+
+    const score = 0.30*dwellTerm + 0.25*rereadTerm + 0.20*backtrackTerm + 0.15*stopTerm + 0.10*speedTerm;
+    return { score: Math.min(score, 1), dwellSec, wpm };
+  }
+
+  function classifyStruggleType(paraId) {
+    const s = paraStats[paraId];
+    if (s.rereadCount >= 1) return "reread";
+    if (s.backtrackCount >= 2) return "backtrack";
+    if (s.cursorStops >= 1) return "slow_reading";
+    return "none";
+  }
+
+  function showIntervention(paraId, arm) {
+    if (arm === "control") return; // control = log assignment but show nothing
+    const el = document.getElementById("intervention-" + paraId);
+    const content = INTERVENTIONS[paraId][arm];
+    el.querySelector(".label").textContent = content.label;
+    el.querySelector(".content").textContent = content.content;
+    el.classList.add("show");
+  }
+
+  // Hook up "This helped" / "Not helpful" buttons
+  document.querySelectorAll(".intervention .dismiss").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const wrap = e.target.closest(".intervention");
+      const paraId = parseInt(wrap.id.split("-")[1], 10);
+      const response = e.target.dataset.response;
+      wrap.querySelectorAll(".dismiss").forEach(b => b.classList.remove("chosen"));
+      e.target.classList.add("chosen");
+      if (interventionLog[paraId]) {
+        interventionLog[paraId].accepted = response === "helpful" ? 1 : 0;
+      }
+      logEvent("intervention_response", { arm: interventionLog[paraId] ? interventionLog[paraId].arm : null, response });
+    });
+  });
+
+  setInterval(() => {
+    if (!sessionId || currentParaId === null) return;
+    const { score, dwellSec } = computeFeatures(currentParaId);
+
+    document.getElementById("stat-para").textContent = "P" + (currentParaId + 1);
+    document.getElementById("stat-dwell").textContent = dwellSec.toFixed(1);
+    document.getElementById("stat-reread").textContent = paraStats[currentParaId].rereadCount;
+    document.getElementById("stat-struggle").textContent = score.toFixed(2);
+
+    if (score >= STRUGGLE_THRESHOLD && !interventionLog[currentParaId]) {
+      const arm = pickArm();
+      const struggleType = classifyStruggleType(currentParaId);
+      interventionLog[currentParaId] = { arm: arm, accepted: null, struggle_type: struggleType };
+      showIntervention(currentParaId, arm);
+      logEvent("intervention_assigned", { arm: arm, struggle_type: struggleType });
+    }
+  }, FEATURE_UPDATE_MS);
+
+  // enable finish button once last paragraph's quick-check is answered
+  document.addEventListener("change", () => {
+    const lastIdx = paragraphs.length - 1;
+    const diffAnswered = document.querySelector('input[name="diff-' + lastIdx + '"]:checked');
+    const quizAnswered = document.querySelector('input[name="quiz-' + lastIdx + '"]:checked');
+    if (diffAnswered && quizAnswered) {
+      document.getElementById("finish-btn").disabled = false;
+    }
+  });
+
+  // =====================================================================
+  // SESSION START (after participant ID entered, or on first interaction)
+  // =====================================================================
+  document.getElementById("pid").addEventListener("change", (e) => {
+    const pid = e.target.value.trim();
+    sessionId = pid ? pid : "session-" + Date.now();
+    setActiveParagraph(getCurrentParagraph() || 0);
+  });
+  document.addEventListener("scroll", function startIfNeeded() {
+    if (!sessionId) {
+      const pid = document.getElementById("pid").value.trim();
+      sessionId = pid ? pid : "session-" + Date.now();
+      setActiveParagraph(getCurrentParagraph() || 0);
+    }
+  }, { once: true });
+  document.addEventListener("mousemove", function startIfNeeded() {
+    if (!sessionId) {
+      const pid = document.getElementById("pid").value.trim();
+      sessionId = pid ? pid : "session-" + Date.now();
+      setActiveParagraph(getCurrentParagraph() || 0);
+    }
+  }, { once: true });
+
+  // =====================================================================
+  // FINISH / EXPORT
+  // =====================================================================
+  document.getElementById("finish-btn").addEventListener("click", () => {
+    setActiveParagraph(null);
+
+    const paragraphEvents = [];
+    const quizResults = [];
+    const interventionRows = [];
+
+    paragraphs.forEach((el, i) => {
+      const features = computeFeatures(i);
+      const s = paraStats[i];
+
+      paragraphEvents.push({
+        session_id: sessionId,
+        paragraph_id: i,
+        dwell_time_s: Math.round(features.dwellSec * 10) / 10,
+        reread_count: s.rereadCount,
+        backtrack_count: s.backtrackCount,
+        cursor_stops: s.cursorStops,
+        avg_mouse_speed: Math.round(avg(s.mouseSpeeds) * 10) / 10,
+        reading_speed_wpm: Math.round(features.wpm * 10) / 10,
+        struggle_score: Math.round(features.score * 1000) / 1000,
+        struggle_type: classifyStruggleType(i),
+      });
+
+      const diffInput = document.querySelector('input[name="diff-' + i + '"]:checked');
+      const quizInput = document.querySelector('input[name="quiz-' + i + '"]:checked');
+      const quizCorrect = quizInput ? (quizInput.dataset.correct === "true" ? 1 : 0) : null;
+
+      quizResults.push({
+        session_id: sessionId,
+        paragraph_id: i,
+        self_report_difficulty: diffInput ? parseInt(diffInput.value, 10) : null,
+        quiz_correct: quizCorrect,
+      });
+
+      if (interventionLog[i]) {
+        interventionRows.push({
+          session_id: sessionId,
+          paragraph_id: i,
+          struggle_type: interventionLog[i].struggle_type,
+          arm: interventionLog[i].arm,
+          accepted: interventionLog[i].accepted,
+          follow_up_correct: quizCorrect, // quiz for this paragraph IS the follow-up
+        });
+      }
+    });
+
+    const sessionData = {
+      session_id: sessionId,
+      raw_events: rawEvents,
+      paragraph_events: paragraphEvents,
+      quiz_results: quizResults,
+      intervention_log: interventionRows,
+    };
+
+    const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const linkDiv = document.getElementById("download-link");
+    linkDiv.innerHTML = '<a href="' + url + '" download="' + sessionId + '.json">Download ' + sessionId + '.json</a>';
+    document.getElementById("finish-overlay").classList.add("show");
+  });
+})();
+</script>
+
+</body>
+</html>
