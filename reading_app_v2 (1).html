@@ -207,7 +207,7 @@
 </header>
 
 <main>
-  <div class="doc-title">How Coral Reefs Build Themselves</div>
+  <div class="doc-title">Modern AI Paradigms: Core Concepts, Language Models, and Reinforcement Learning</div>
   <div id="reading-container"></div>
 </main>
 
@@ -230,150 +230,99 @@
 <script>
 (function () {
   // =====================================================================
-  // CONTENT — paragraphs, quiz questions, and intervention content.
-  // Edit this section to use a different document.
+  // CONTENT — Paragraphs, quiz questions, and pre-built interventions.
   // =====================================================================
   const PARAGRAPHS = [
     {
-      text: `Coral reefs are often described as the rainforests of the sea, and the comparison
-      holds up well. A single reef can host thousands of species, from tiny shrimp to
-      large predatory fish, all depending on the same structure for food and shelter.
-      What looks like a rock formation is, in fact, made by living animals working
-      together over very long stretches of time.`,
-      words: 62,
+      text: "Artificial Intelligence (AI) has a rich history and a rapidly expanding footprint. The term 'Artificial Intelligence' itself was first mentioned as early as 1956! Today, AI can beat world chess champions, Go champions, and even video game champions. Beyond gaming, there is some AI that can tell stories, create music, or even paint. According to industry experts, artificial intelligence will be incorporated into nearly all work and industries by the year 2030.",
+      words: 76,
       quiz: {
-        question: "According to this paragraph, what is a coral reef mainly built by?",
-        options: [
-          { text: "Living animals working together over a long time", correct: true },
-          { text: "Volcanic rock formations", correct: false },
-          { text: "Sand and coral fragments washed ashore", correct: false },
-        ],
+        question: "According to the text, by which year do experts predict AI will be incorporated into nearly all industries?",
+        options: ["1956", "2024", "2030", "2050"],
+        answer: 2
       },
+      interventions: {
+        A_definition: "Footprint: The absolute scale, impact, or presence that an operational system occupies within a specific domain.",
+        B_summary: "AI has evolved since 1956 from defeating world gaming champions to creating art, with experts predicting widespread industry integration by 2030.",
+        C_rephrase: "Artificial intelligence isn't new; it was first talked about back in 1956. Today, it can defeat human champions at games like chess, write stories, make music, and paint. Experts think AI will be part of almost every single job and industry by 2030.",
+        D_analogy: "Think of AI's growth like smartphones: it started as a rare, basic concept decades ago, but it has quickly adapted to handle creative tasks and will soon be a mandatory tool everywhere."
+      }
     },
     {
-      text: `The animals responsible are coral polyps, small soft-bodied organisms related to
-      sea anemones. Each polyp builds a hard skeleton of calcium carbonate around itself.
-      When thousands of polyps grow side by side and their skeletons fuse together, the
-      result is the solid reef structure that boats and divers can see from a distance.`,
-      words: 58,
+      text: "Machine learning, or artificial intelligence (AI), is a paradigm of computing in which the algorithm 'learns' from the top down rather than being designed from the bottom up. The top-down approach is achieved by letting the algorithm try solutions, rewarding it for good behaviour, and penalizing it for bad behaviour — a primitive form of 'learning.' Ideally, the algorithm becomes capable of correctly identifying the content of unseen and unlabelled pictures. Because the algorithm is not designed to carry out steps known to solve the problem, it often doesn't — and even when it does, the reason it makes any particular decision is elusive, underscoring the thorny problem of AI safety.",
+      words: 112,
       quiz: {
-        question: "What do coral polyps build around themselves?",
-        options: [
-          { text: "A hard skeleton made of calcium carbonate", correct: true },
-          { text: "A soft shell made of algae", correct: false },
-          { text: "A net of fibers used to catch food", correct: false },
-        ],
+        question: "Why does machine learning present a challenging or 'thorny' problem for AI safety?",
+        options: ["It cannot correctly process unseen or unlabelled images.", "It relies strictly on rigid bottom-up software design frameworks.", "The inner mathematical reasons behind its specific decisions are elusive and hard to trace.", "It is incapable of learning from performance penalties."],
+        answer: 2
       },
+      interventions: {
+        A_definition: "Elusive: Difficult to find, isolate, define, track down, or fully analyze.",
+        B_summary: "Machine learning systems learn dynamically via a trial-and-error reward structure, but their exact decision-making steps remain hidden and hard to explain.",
+        C_rephrase: "Instead of following a step-by-step human design, machine learning apps learn on their own by trying answers and getting rewards or penalties. Even when they get an answer right, it is tough to see the exact reason why they made that choice, which makes safety hard to guarantee.",
+        D_analogy: "It's exactly like training a puppy: you give it a treat when it does something good and say 'no' when it fails, but you can't read its brainwaves to know exactly what it's thinking."
+      }
     },
     {
-      text: `What makes this process unusually efficient is a partnership between the coral
-      polyp and a microscopic algae called zooxanthellae, which live inside the polyp's
-      tissue. The algae perform photosynthesis and pass a large share of the resulting
-      sugars to the coral, while the coral provides the algae with a protected
-      environment and a steady supply of carbon dioxide. This exchange allows reefs to
-      grow in waters that would otherwise be too nutrient-poor to support such dense
-      animal life, which is part of why reefs are often called an ecological paradox —
-      enormous productivity in what should be a biological desert.`,
-      words: 91,
+      text: "Large language models (LLMs) are a category of deep learning models trained on immense amounts of data, making them capable of understanding and generating natural language and other types of content to perform a wide range of tasks. LLMs are built on a type of neural network architecture called a transformer which excels at handling sequences of words and capturing patterns in text. LLMs work as giant statistical prediction machines that repeatedly predict the next word in a sequence. They learn patterns in their text and generate language that follows those patterns. LLMs represent a major leap in how humans interact with technology because they are the first AI system that can handle unstructured human language at scale, allowing for natural communication with machines. Where traditional search engines and other programmed systems used algorithms to match keywords, LLMs capture deeper context, nuance and reasoning. LLMs, once trained, can adapt to many applications that involve interpreting text, like summarizing an article, debugging code or drafting a legal clause. When given agentic capabilities, LLMs can perform, with varying degrees of autonomy, various tasks that would otherwise be performed by humans.",
+      words: 191,
       quiz: {
-        question: "What do zooxanthellae give to the coral?",
-        options: [
-          { text: "Sugars produced through photosynthesis", correct: true },
-          { text: "Extra oxygen only", correct: false },
-          { text: "A hard protective shell", correct: false },
-        ],
+        question: "What structural capability allows LLMs to outperform traditional keyword-matching search engines?",
+        options: ["They execute processing cycles faster.", "They capture deep contextual meaning, linguistic nuance, and reasoning structures.", "They avoid using neural networks.", "They store pre-written conversational template scripts."],
+        answer: 1
       },
+      interventions: {
+        A_definition: "Agentic Capabilities: Software features that grant an AI system the independent power to take multi-step actions to achieve a goal.",
+        B_summary: "LLMs are massive deep learning models powered by transformer neural links that read text sequences, calculate word patterns statistically, and comprehend natural context at scale.",
+        C_rephrase: "Large Language Models are massive AI tools trained on huge amounts of texts. Running on a core called a transformer, they act like high-powered prediction systems that guess the next word in a sentence. Unlike old search engines that just scan for exact keywords, LLMs understand the hidden meaning and logic behind your phrases.",
+        D_analogy: "Think of an LLM like an incredibly well-read assistant who has memorized a global library; they don't just find standard words, they understand context so well they can help you write letters or fix your software code."
+      }
     },
     {
-      text: `Reef growth is slow by human standards. Many reef-building corals add only a few
-      centimetres to their skeletons each year, and a large reef structure may represent
-      thousands of years of continuous growth. Because of this slow pace, damage from
-      storms, disease, or rising water temperatures can take decades to repair, even
-      when the surrounding conditions return to normal fairly quickly.`,
-      words: 70,
+      text: "Physical AI refers to artificial intelligence systems that operate in and interact with the physical world, rather than existing only in software or digital environments. Physical AI typically involves the combination of AI models with sensors, actuators and other control systems that allow models to act upon real-world environments, taking models from the realm of bits to the realm of atoms. With AI, advanced physical systems can now perceive the environment, reason with the power of a large language model (LLM), act accordingly, and then learn from the outcome of that action. In contrast, robotic AI agents equipped with general understanding from LLMs have a limited but still powerful 'common sense' about the world. These models can be paired with reinforcement learning techniques in high-performance hybrid architectures so that robots can possess both general knowledge and a specialized understanding of a specific use case.",
+      words: 153,
       quiz: {
-        question: "Why can reef damage take decades to repair?",
-        options: [
-          { text: "Because reef-building corals grow only a few centimetres per year", correct: true },
-          { text: "Because reefs only grow at night", correct: false },
-          { text: "Because algae take decades to reproduce", correct: false },
-        ],
+        question: "According to the text, what does pairing an LLM with reinforcement learning allow a robot to possess?",
+        options: ["Infinite battery life and memory storage configurations.", "Both broad general world knowledge and a specialized functional skill set.", "A complete shift from hardware components to software applications.", "An automated sequence that skips sensor readings entirely."],
+        answer: 1
       },
+      interventions: {
+        A_definition: "Actuators: Mechanical hardware components responsible for moving or manipulating a physical machine setup.",
+        B_summary: "Physical AI combines models with mechanical sensors and actuators, moving AI from pure software data into physical hardware capable of reasoning and acting safely.",
+        C_rephrase: "Physical AI means artificial intelligence built into real-world machines instead of sitting safely inside a computer screen. By mixing AI brains with hardware parts like sensors and motors, machines can see their surroundings, use logic, and learn from physical actions.",
+        D_analogy: "Standard AI is like a brilliant brain floating in a cloud database jar; Physical AI is taking that brain and connecting it to muscles, eyes, and limbs so it can walk, lift things, and work on a factory floor."
+      }
     },
     {
-      text: `Temperature is one of the most important factors in this relationship, and it is
-      also the most fragile part of it. When water becomes too warm, the coral expels
-      its zooxanthellae, losing both its colour and its main energy source — a process
-      known as coral bleaching. A bleached coral is not dead, but it is under severe
-      stress, and if warm conditions persist for too long, the coral will eventually
-      starve. Because the entire reef depends on this single partnership repeating
-      successfully across millions of polyps, even a small shift in average temperature
-      can affect an enormous structure.`,
-      words: 84,
+      text: "Retrieval-Augmented Generation (RAG) is a technique that gives a Large Language Model (LLM) access to outside information to make its answers more accurate. First, a business's documents are split into smaller text chunks and converted into math formulas called vector embeddings. These embeddings capture the core meaning of the text and are saved in a vector database. When a user asks a question, the system searches this database for the closest matching text chunks using mathematical formulas like Cosine Similarity. Finally, the system merges the user's question with these retrieved facts and feeds them into the LLM, allowing the model to write a highly accurate answer based on real data instead of guessing.",
+      words: 114,
       quiz: {
-        question: "What happens during coral bleaching?",
-        options: [
-          { text: "The coral expels its algae and loses colour and energy", correct: true },
-          { text: "The coral grows a new, harder skeleton", correct: false },
-          { text: "The reef's water temperature drops suddenly", correct: false },
-        ],
+        question: "How does a RAG pipeline ensure an LLM writes an accurate response instead of guessing?",
+        options: ["By changing the source programming language of the framework.", "By forcing the system to random-search online engines.", "By retrieving matching text chunks from an embedding database and feeding those verified facts directly into the model context.", "By limiting the user's prompt window query size."],
+        answer: 2
       },
+      interventions: {
+        A_definition: "Vector Embeddings: Numeric coordinate strings that mathematically represent the underlying semantic meaning of text chunks.",
+        B_summary: "RAG converts internal documents into mathematical vector embeddings, looks up matching information at runtime, and appends those factual text chunks straight into the model prompt.",
+        C_rephrase: "RAG is a clever way to link an AI model to an external folder so it stops confidently making up false answers. It chops documents into pieces, converts them into numeric codes, and saves them. When a user queries the app, it pulls the most relevant text matches and gives them to the AI to write an accurate reply.",
+        D_analogy: "It's exactly like an open-book exam: instead of panicking and guessing answers completely from memory, you use an index to flip open a manual to the correct page and read the facts."
+      }
     },
-  ];
-
-  // Hand-written intervention content per paragraph per arm.
-  // In a full deployment, generate these via an LLM API call instead.
-  const INTERVENTIONS = [
-    { // paragraph 0
-      A_definition: { label: "Word help",
-        content: `"Predatory" means an animal that hunts and eats other animals.` },
-      B_summary: { label: "Simple summary",
-        content: `Coral reefs are like underwater rainforests — many different sea creatures live together and depend on the same reef structure for food and shelter.` },
-      C_rephrase: { label: "Simplified version",
-        content: `Coral reefs are a lot like rainforests in the ocean. A reef can be home to thousands of different animals, from small shrimp to big fish that hunt other animals. All of these animals need the reef for food and a place to live. Even though a reef looks like a rock, it is actually built by living animals over a very long time.` },
-      D_analogy: { label: "Analogy",
-        content: `Think of a coral reef like an apartment building constructed slowly, brick by brick, by its own residents — and now thousands of different "tenants" live in it.` },
-    },
-    { // paragraph 1
-      A_definition: { label: "Word help",
-        content: `"Polyps" are tiny, soft-bodied sea animals related to anemones. "Calcium carbonate" is a hard mineral — the same substance found in chalk and seashells.` },
-      B_summary: { label: "Simple summary",
-        content: `Tiny animals called coral polyps build hard skeletons around themselves, and when many grow together, their skeletons join to form the reef.` },
-      C_rephrase: { label: "Simplified version",
-        content: `Coral polyps are small, soft animals related to sea anemones. Each one builds a hard, shell-like skeleton around its body using a mineral called calcium carbonate — the same material found in chalk and seashells. When thousands of these polyps grow next to each other, their skeletons join together. This is what forms the solid reef you can see from a boat or while diving.` },
-      D_analogy: { label: "Analogy",
-        content: `It's a bit like thousands of people each building a tiny brick room right next to their neighbour's — eventually, all those rooms connect into one giant structure.` },
-    },
-    { // paragraph 2 (hardest)
-      A_definition: { label: "Word help",
-        content: `"Zooxanthellae" are tiny algae living inside coral that make food using sunlight. "Photosynthesis" is how plants and algae turn sunlight into food. An "ecological paradox" is something that seems impossible because the environment shouldn't support so much life — but it does.` },
-      B_summary: { label: "Simple summary",
-        content: `Coral and a type of algae living inside it help each other: the algae make food from sunlight and share it with the coral, while the coral protects the algae. This partnership lets reefs thrive even in waters with very few nutrients.` },
-      C_rephrase: { label: "Simplified version",
-        content: `Coral works closely with a tiny algae called zooxanthellae that lives inside its body. The algae use sunlight to make food — a process called photosynthesis — and give most of that food to the coral. In return, the coral gives the algae a safe place to live and a steady supply of carbon dioxide, which the algae need. Because of this teamwork, reefs can grow in ocean water that doesn't have many nutrients — water that normally couldn't support so much life. This is why people sometimes call reefs a "puzzle of nature": huge amounts of life growing in what should be an empty environment.` },
-      D_analogy: { label: "Analogy",
-        content: `It's similar to a tenant (the algae) who cooks meals using sunlight from a window and shares the food with the landlord (the coral), in exchange for free rent and protection — both benefit, and neither would do as well alone.` },
-    },
-    { // paragraph 3
-      A_definition: { label: "Word help",
-        content: `"Reef-building corals" are the species of coral that grow hard skeletons and form reefs (as opposed to soft corals, which don't).` },
-      B_summary: { label: "Simple summary",
-        content: `Coral reefs grow very slowly — often just a few centimetres a year — so damage from storms or warming water can take decades to heal.` },
-      C_rephrase: { label: "Simplified version",
-        content: `Reefs grow very slowly compared to how we usually think about growth. Many corals add only a few centimetres to their skeleton each year. Because of this slow pace, a large reef structure might represent thousands of years of growth. If a storm, disease, or warm water damages the reef, it can take many decades to recover — even after conditions go back to normal.` },
-      D_analogy: { label: "Analogy",
-        content: `It's like a tree that takes a hundred years to grow tall — if a storm snaps its branches, it won't grow back to that size in just a year or two, no matter how good the weather is afterward.` },
-    },
-    { // paragraph 4
-      A_definition: { label: "Word help",
-        content: `"Bleaching" is when coral turns white and loses its food source because it pushes out the algae living inside it due to heat stress. "Expels" means pushes out or gets rid of.` },
-      B_summary: { label: "Simple summary",
-        content: `When the ocean gets too warm, coral pushes out its algae partner, turns white, and loses its main source of food — a process called bleaching. If the heat continues too long, the coral can starve.` },
-      C_rephrase: { label: "Simplified version",
-        content: `Warm water is both very important to coral and very dangerous for it. If the water gets too hot, the coral pushes out the algae living inside it. This causes the coral to lose its colour and its main source of food — this is called coral bleaching. A bleached coral isn't dead yet, but it's in serious trouble. If the warm water lasts too long, the coral will eventually starve. Because every coral in a reef depends on this same partnership, even a small rise in average ocean temperature can damage a huge area of reef.` },
-      D_analogy: { label: "Analogy",
-        content: `It's like a person asking their roommate — who cooks all the meals — to leave because the apartment got too hot. They might survive a few days without food, but if the heat doesn't let up and they can't find another roommate, they'll eventually go hungry.` },
-    },
+    {
+      text: "Working of Reinforcement Learning: The agent interacts iteratively with its environment in a feedback loop. The agent observes the current state of the environment. It chooses and performs an action based on its policy. The environment responds by transitioning to a new state and providing a reward (or penalty). The agent updates its knowledge (policy, value function) based on the reward received and the new state. This cycle repeats with the agent balancing exploration (trying new actions) and exploitation (using known good actions) to maximize the cumulative reward over time. This process is mathematically framed as a Markov Decision Process (MDP) where future states depend only on the current state and action, not on the prior sequence of events.",
+      words: 122,
+      quiz: {
+        question: "What core independence rule defines a Markov Decision Process (MDP)?",
+        options: ["Future outcomes are independent of the current state or choice.", "Future states depend strictly on the current state-action pair, ignoring historical paths.", "The agent must prioritize exploration over exploitation in every loop.", "Rewards cannot be calculated using numerical parameters."],
+        answer: 1
+      },
+      interventions: {
+        A_definition: "Exploitation: A reinforcement learning operational choice where the agent chooses actions that have already proven to produce high rewards.",
+        B_summary: "Reinforcement learning optimizes behaviors inside a continuous loop where an agent observes states, executes choices via an internal policy map, and logs numerical rewards.",
+        C_rephrase: "Reinforcement learning is a continuous cycle where a program learns by interacting with its surroundings. The program views its situation, takes a step based on its current rule set, and gets back a positive point score or a negative penalty. It balances trying new paths with sticking to what already works to get the highest score.",
+        D_analogy: "It is exactly like playing a classic video game for the very first time: you click buttons randomly at first, notice your high score increase or decrease depending on the moves you make, and use that loop to build a winning strategy."
+      }
+    }
   ];
 
   // =====================================================================
@@ -385,7 +334,6 @@
   const BACKTRACK_PX = 30;
   const FEATURE_UPDATE_MS = 1000;
 
-  // Intervention arms: 20% control (no help), 20% each of the 4 arms.
   const ARMS = ["control", "A_definition", "B_summary", "C_rephrase", "D_analogy"];
   function pickArm() {
     return ARMS[Math.floor(Math.random() * ARMS.length)];
@@ -433,8 +381,8 @@
       <div class="quiz-row">
         <div class="q-text">${p.quiz.question}</div>
         <div class="quiz-options">
-          ${p.quiz.options.map((o, oi) => `
-            <label><input type="radio" name="quiz-${i}" value="${oi}" data-correct="${o.correct}"> ${o.text}</label>
+          ${p.quiz.options.map((optionText, oi) => `
+            <label><input type="radio" name="quiz-${i}" value="${oi}"> ${optionText}</label>
           `).join("")}
         </div>
       </div>`;
@@ -446,7 +394,7 @@
   // =====================================================================
   const rawEvents = [];
   const paraStats = {};
-  const interventionLog = {}; // paragraph_id -> { arm, accepted, struggle_type }
+  const interventionLog = {}; 
   let sessionId = null;
 
   const paragraphs = Array.from(document.querySelectorAll(".reading-para"));
@@ -468,7 +416,7 @@
   let lastScrollY = window.scrollY;
 
   // =====================================================================
-  // PARAGRAPH POSITION MAPPING
+  // POSITION MAPPING
   // =====================================================================
   function getParaBounds(i) {
     const el = paragraphs[i];
@@ -511,7 +459,7 @@
   }
 
   // =====================================================================
-  // MOUSE / SCROLL / VISIBILITY TRACKING
+  // TRACKING LISTENERS
   // =====================================================================
   document.addEventListener("mousemove", (e) => {
     if (!sessionId) return;
@@ -561,7 +509,7 @@
   });
 
   // =====================================================================
-  // STRUGGLE SCORE + INTERVENTIONS
+  // STRUGGLE MATH + SHOW INTERVENTIONS FIXED
   // =====================================================================
   function avg(arr) { return arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : 0; }
 
@@ -589,15 +537,23 @@
   }
 
   function showIntervention(paraId, arm) {
-    if (arm === "control") return; // control = log assignment but show nothing
+    if (arm === "control") return; 
     const el = document.getElementById("intervention-" + paraId);
-    const content = INTERVENTIONS[paraId][arm];
-    el.querySelector(".label").textContent = content.label;
-    el.querySelector(".content").textContent = content.content;
+    
+    // Fixed lookup path mapping straight to our internal paragraph config parameters
+    const labelMapping = {
+      "A_definition": "AI Vocabulary Definition Help",
+      "B_summary": "AI Summary Highlight",
+      "C_rephrase": "AI Simple Rephrase Assist",
+      "D_analogy": "AI Relatable Analogy Concept"
+    };
+
+    const textContent = PARAGRAPHS[paraId].interventions[arm];
+    el.querySelector(".label").textContent = labelMapping[arm] || "AI Hint";
+    el.querySelector(".content").textContent = textContent;
     el.classList.add("show");
   }
 
-  // Hook up "This helped" / "Not helpful" buttons
   document.querySelectorAll(".intervention .dismiss").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const wrap = e.target.closest(".intervention");
@@ -630,7 +586,6 @@
     }
   }, FEATURE_UPDATE_MS);
 
-  // enable finish button once last paragraph's quick-check is answered
   document.addEventListener("change", () => {
     const lastIdx = paragraphs.length - 1;
     const diffAnswered = document.querySelector('input[name="diff-' + lastIdx + '"]:checked');
@@ -641,7 +596,7 @@
   });
 
   // =====================================================================
-  // SESSION START (after participant ID entered, or on first interaction)
+  // SESSION CONTROLS
   // =====================================================================
   document.getElementById("pid").addEventListener("change", (e) => {
     const pid = e.target.value.trim();
@@ -664,7 +619,7 @@
   }, { once: true });
 
   // =====================================================================
-  // FINISH / EXPORT
+  // DATA DOWNLOAD OUTPUT MAPPING
   // =====================================================================
   document.getElementById("finish-btn").addEventListener("click", () => {
     setActiveParagraph(null);
@@ -692,7 +647,13 @@
 
       const diffInput = document.querySelector('input[name="diff-' + i + '"]:checked');
       const quizInput = document.querySelector('input[name="quiz-' + i + '"]:checked');
-      const quizCorrect = quizInput ? (quizInput.dataset.correct === "true" ? 1 : 0) : null;
+      
+      // Fixed quiz correction logic matching numerical index values directly
+      let quizCorrect = null;
+      if (quizInput) {
+        const selectedIndex = parseInt(quizInput.value, 10);
+        quizCorrect = (selectedIndex === PARAGRAPHS[i].quiz.answer) ? 1 : 0;
+      }
 
       quizResults.push({
         session_id: sessionId,
@@ -708,7 +669,7 @@
           struggle_type: interventionLog[i].struggle_type,
           arm: interventionLog[i].arm,
           accepted: interventionLog[i].accepted,
-          follow_up_correct: quizCorrect, // quiz for this paragraph IS the follow-up
+          follow_up_correct: quizCorrect, 
         });
       }
     });
