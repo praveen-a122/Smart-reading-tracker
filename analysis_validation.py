@@ -16,7 +16,9 @@ para_df = pd.read_csv("paragraph_events.csv")
 quiz_df = pd.read_csv("quiz_results.csv")
 interv_df = pd.read_csv("intervention_log.csv")
 
+demographic_cols = ['age', 'gender', 'study_details', 'region', 'primary_language']
 df = para_df.merge(quiz_df, on=["session_id", "paragraph_id"])
+merged_df = pd.merge(para_df, quiz_df, on=['session_id', 'paragraph_id'], how='inner')
 
 print("=" * 60)
 print("RQ1: Struggle score vs self-report difficulty / quiz score")
@@ -60,3 +62,29 @@ print(pivot.idxmax(axis=1))
 # acceptance rate by arm
 print("\nAcceptance rate by arm:")
 print(interv_df.groupby("arm")["accepted"].mean().round(3))
+
+
+print("\n==========================================================")
+print("ADDITIONAL: Demographic Subgroup Analysis")
+print("==========================================================\n")
+
+# 1. Performance and Struggle by Gender
+if 'gender' in merged_df.columns:
+    gender_stats = merged_df.groupby('gender')[['struggle_score', 'quiz_correct']].mean()
+    print("--- Metrics Grouped by Gender ---")
+    print(gender_stats)
+    print("\n")
+
+# 2. Performance and Struggle by Primary Language
+if 'primary_language' in merged_df.columns:
+    lang_stats = merged_df.groupby('primary_language')[['struggle_score', 'quiz_correct']].mean()
+    print("--- Metrics Grouped by Primary Language ---")
+    print(lang_stats)
+    print("\n")
+
+# 3. Performance and Struggle by Region
+if 'region' in merged_df.columns:
+    region_stats = merged_df.groupby('region')[['struggle_score', 'quiz_correct']].mean()
+    print("--- Metrics Grouped by Region ---")
+    print(region_stats)
+    print("\n")
