@@ -33,29 +33,79 @@
   }
 
   header h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: 0.02em; }
-  header p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  header p { margin: 4px 0 20px; color: var(--muted); font-size: 14px; }
 
-  #participant-box {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  /* Registration Form Box Styles */
+  #setup-modal {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    margin-top: 15px;
   }
 
-  #participant-box label { font-size: 13px; color: var(--muted); }
-  #participant-box input {
+  #setup-modal h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  #registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #registration-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #registration-form label {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--muted);
+  }
+
+  #registration-form input, #registration-form select {
     font-family: inherit;
     font-size: 14px;
-    padding: 6px 10px;
+    padding: 8px 10px;
     border: 1px solid var(--line);
     border-radius: 4px;
-    width: 160px;
+    width: 100%;
+    background: var(--panel);
+    color: var(--ink);
+  }
+
+  #registration-form button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: inherit;
+  }
+
+  #registration-form button:hover {
+    background: #944022;
   }
 
   main {
     max-width: 680px;
     margin: 0 auto;
     padding: 36px 24px 140px;
+  }
+
+  /* Initially hide the application core workspace until profile setup is complete */
+  #experiment-container {
+    display: none;
   }
 
   .doc-title { font-size: 26px; margin-bottom: 24px; }
@@ -139,7 +189,7 @@
   .scale-row { margin-bottom: 12px; }
   .scale-row .scale-label { display: block; font-size: 13px; margin-bottom: 6px; }
   .scale { display: flex; gap: 6px; max-width: 320px; }
-  .scale label {
+  .scale #setup-modal label, .scale label {
     flex: 1; text-align: center; border: 1px solid var(--line);
     border-radius: 4px; padding: 5px 0; font-size: 13px; cursor: pointer;
   }
@@ -200,23 +250,86 @@
   <h1>Smart Reading Tracker — Reading Session</h1>
   <p>Read the passage below at your normal pace. Keep your mouse on the screen as you read.
   After each paragraph, a short check appears — answer it before moving to the next paragraph.</p>
-  <div id="participant-box">
-    <label for="pid">Participant ID:</label>
-    <input type="text" id="pid" placeholder="e.g. P07" />
+  
+  <div id="setup-modal">
+    <h2>Participant Registration</h2>
+    <form id="registration-form">
+        <div class="form-group">
+          <label for="participant-id">Participant ID (e.g., P01):</label>
+          <input type="text" id="participant-id" required placeholder="Enter any ID">
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" min="15" max="99" required placeholder="e.g., 20">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender:</label>
+          <select id="gender" required>
+              <option value="">--Select--</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="study-details">Branch / Major / Course:</label>
+          <select id="study-details" required>
+              <option value="">--Select Branch--</option>
+              <option value="BTech CSE (General)">BTech CSE </option>
+              <option value="BTech ECE">BTech ECE</option>
+              <option value="BTech Mechanical">BTech Mechanical</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="region">Region / State:</label>
+          <select id="region" required>
+              <option value="">--Select Region--</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="primary-language">Primary Language(Mother Tongue):</label>
+          <select id="primary-language" required>
+              <option value="">--Select Language--</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Kannada">Kannada</option>
+              <option value="Malayalam">Malayalam</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Telugu">Telugu</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+        <button type="submit">Start Reading Session</button>
+    </form>
   </div>
 </header>
 
-<main>
-  <div class="doc-title">Modern AI Paradigms: Core Concepts, Language Models, and Reinforcement Learning</div>
-  <div id="reading-container"></div>
-</main>
+<div id="experiment-container">
+  <main>
+    <div class="doc-title">Modern AI Paradigms: Core Concepts, Language Models, and Reinforcement Learning</div>
+    <div id="reading-container"></div>
+  </main>
 
-<div id="status-panel">
-  <div class="stat"><span>Current paragraph</span><span id="stat-para">—</span></div>
-  <div class="stat"><span>Dwell time (s)</span><span id="stat-dwell">0</span></div>
-  <div class="stat"><span>Reread count</span><span id="stat-reread">0</span></div>
-  <div class="stat"><span>Struggle score</span><span id="stat-struggle">0.00</span></div>
-  <button id="finish-btn" disabled>Finish & download data</button>
+  <div id="status-panel">
+    <div class="stat"><span>Current paragraph</span><span id="stat-para">—</span></div>
+    <div class="stat"><span>Dwell time (s)</span><span id="stat-dwell">0</span></div>
+    <div class="stat"><span>Reread count</span><span id="stat-reread">0</span></div>
+    <div class="stat"><span>Struggle score</span><span id="stat-struggle">0.00</span></div>
+    <button id="finish-btn" disabled>Finish & download data</button>
+  </div>
 </div>
 
 <div id="finish-overlay">
@@ -395,7 +508,10 @@
   const rawEvents = [];
   const paraStats = {};
   const interventionLog = {}; 
+  
+  // Storage fields initialized to hold user details
   let sessionId = null;
+  let participantDemographics = {};
 
   const paragraphs = Array.from(document.querySelectorAll(".reading-para"));
   paragraphs.forEach((el, i) => {
@@ -457,6 +573,34 @@
       paragraphs[currentParaId].classList.add("active");
     }
   }
+
+  // =====================================================================
+  // SESSION CONTROLS TRIPPED BY FORM SUBMISSION
+  // =====================================================================
+  window.startSession = function(event) {
+    event.preventDefault(); // Lock screen reload
+    
+    // Harvest data elements
+    sessionId = document.getElementById('participant-id').value.trim();
+    participantDemographics = {
+      age: document.getElementById('age').value,
+      gender: document.getElementById('gender').value,
+      study_details: document.getElementById('study-details').value,
+      region: document.getElementById('region').value,
+      primary_language: document.getElementById('primary-language').value
+    };
+
+    // Transition layouts
+    document.getElementById('setup-modal').style.display = 'none';
+    document.getElementById('experiment-container').style.display = 'block';
+
+    // Kick off runtime processes
+    setActiveParagraph(getCurrentParagraph() || 0);
+    logEvent("session_started", participantDemographics);
+  };
+
+  // Wire submission engine directly to the registration node hook
+  document.getElementById("registration-form").addEventListener("submit", window.startSession);
 
   // =====================================================================
   // TRACKING LISTENERS
@@ -540,7 +684,6 @@
     if (arm === "control") return; 
     const el = document.getElementById("intervention-" + paraId);
     
-    // Fixed lookup path mapping straight to our internal paragraph config parameters
     const labelMapping = {
       "A_definition": "AI Vocabulary Definition Help",
       "B_summary": "AI Summary Highlight",
@@ -596,29 +739,6 @@
   });
 
   // =====================================================================
-  // SESSION CONTROLS
-  // =====================================================================
-  document.getElementById("pid").addEventListener("change", (e) => {
-    const pid = e.target.value.trim();
-    sessionId = pid ? pid : "session-" + Date.now();
-    setActiveParagraph(getCurrentParagraph() || 0);
-  });
-  document.addEventListener("scroll", function startIfNeeded() {
-    if (!sessionId) {
-      const pid = document.getElementById("pid").value.trim();
-      sessionId = pid ? pid : "session-" + Date.now();
-      setActiveParagraph(getCurrentParagraph() || 0);
-    }
-  }, { once: true });
-  document.addEventListener("mousemove", function startIfNeeded() {
-    if (!sessionId) {
-      const pid = document.getElementById("pid").value.trim();
-      sessionId = pid ? pid : "session-" + Date.now();
-      setActiveParagraph(getCurrentParagraph() || 0);
-    }
-  }, { once: true });
-
-  // =====================================================================
   // DATA DOWNLOAD OUTPUT MAPPING
   // =====================================================================
   document.getElementById("finish-btn").addEventListener("click", () => {
@@ -648,7 +768,6 @@
       const diffInput = document.querySelector('input[name="diff-' + i + '"]:checked');
       const quizInput = document.querySelector('input[name="quiz-' + i + '"]:checked');
       
-      // Fixed quiz correction logic matching numerical index values directly
       let quizCorrect = null;
       if (quizInput) {
         const selectedIndex = parseInt(quizInput.value, 10);
@@ -674,8 +793,14 @@
       }
     });
 
+    // Final consolidated dataset combining master parent headers alongside downstream arrays
     const sessionData = {
       session_id: sessionId,
+      age: participantDemographics.age || '',
+      gender: participantDemographics.gender || '',
+      study_details: participantDemographics.study_details || '',
+      region: participantDemographics.region || '',
+      primary_language: participantDemographics.primary_language || '',
       raw_events: rawEvents,
       paragraph_events: paragraphEvents,
       quiz_results: quizResults,
