@@ -278,7 +278,7 @@
           <label for="study-details">Branch / Major / Course:</label>
           <select id="study-details" required>
               <option value="">--Select Branch--</option>
-              <option value="BTech CSE (General)">BTech CSE </option>
+              <option value="BTech CSE">BTech CSE</option>
               <option value="BTech ECE">BTech ECE</option>
               <option value="BTech Mechanical">BTech Mechanical</option>
               <option value="Other">Other</option>
@@ -729,19 +729,42 @@
     }
   }, FEATURE_UPDATE_MS);
 
+  // Dynamic validation check to ensure 100% form completion
   document.addEventListener("change", () => {
-    const lastIdx = paragraphs.length - 1;
-    const diffAnswered = document.querySelector('input[name="diff-' + lastIdx + '"]:checked');
-    const quizAnswered = document.querySelector('input[name="quiz-' + lastIdx + '"]:checked');
-    if (diffAnswered && quizAnswered) {
-      document.getElementById("finish-btn").disabled = false;
+    let allAnswered = true;
+
+    // Loop through every paragraph check block to verify human inputs exist
+    for (let i = 0; i < PARAGRAPHS.length; i++) {
+      const diffAnswered = document.querySelector(`input[name="diff-${i}"]:checked`);
+      const quizAnswered = document.querySelector(`input[name="quiz-${i}"]:checked`);
+      
+      // If even a single rating grid or quiz selection is missing, block submission
+      if (!diffAnswered || !quizAnswered) {
+        allAnswered = false;
+        break;
+      }
     }
+
+    // Toggle the finish button based on global compliance state
+    document.getElementById("finish-btn").disabled = !allAnswered;
   });
 
   // =====================================================================
   // DATA DOWNLOAD OUTPUT MAPPING
   // =====================================================================
   document.getElementById("finish-btn").addEventListener("click", () => {
+    // INTERVENTION LOCK CHECK: Ensure triggered banners received active feedback
+    for (let i = 0; i < PARAGRAPHS.length; i++) {
+      // If a banner was assigned/displayed, but 'accepted' state is still null
+      if (interventionLog[i] && interventionLog[i].accepted === null && interventionLog[i].arm !== "control") {
+        alert(`Please provide feedback on the AI help banner for Paragraph ${i + 1} before downloading data!`);
+        
+        // Smooth scroll straight to the skipped element so they can click it instantly
+        document.getElementById("intervention-" + i).scrollIntoView({ behavior: 'smooth' });
+        return; 
+      }
+    }
+
     setActiveParagraph(null);
 
     const paragraphEvents = [];
