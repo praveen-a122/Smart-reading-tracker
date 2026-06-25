@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Reading Tracker — Dynamic Session</title>
+<style>
+  :root {
+    --bg: #faf8f3;
+    --ink: #2b2a28;
+    --muted: #7a766c;
+    --accent: #b5532f;
+    --accent-soft: #f3e6dd;
+    --line: #e3ddd2;
+    --panel: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+  }
+
+  header {
+    padding: 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+
+  header h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: 0.02em; }
+  header p { margin: 4px 0 20px; color: var(--muted); font-size: 14px; }
+
+  /* Registration Form Box Styles */
+  #setup-modal {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    margin-top: 15px;
+  }
+
+  #setup-modal h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  #registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #registration-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #registration-form label {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--muted);
+  }
+
+  #registration-form input, #registration-form select {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 100%;
+    background: var(--panel);
+    color: var(--ink);
+  }
+
+  #registration-form button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: inherit;
+  }
+
+  #registration-form button:hover {
+    background: #944022;
+  }
+
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 36px 24px 140px;
+  }
+
+  /* Initially hide the application core workspace until profile setup is complete */
+  #experiment-container {
+    display: none;
+  }
+
+  .doc-title { font-size: 26px; margin-bottom: 24px; }
+
+  p.reading-para {
+    font-size: 19px;
+    margin: 0 0 14px;
+    padding: 4px 0;
+    border-radius: 4px;
+    transition: background 0.4s ease;
+  }
+
+  p.reading-para.active { background: rgba(181, 83, 47, 0.05); }
+
+  /* Intervention banner */
+  .intervention {
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 0 0 14px;
+    display: none;
+    animation: fade-in 0.3s ease;
+  }
+
+  .intervention.show { display: block; }
+
+  .intervention .label {
+    font-weight: bold;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .intervention .content { color: var(--ink); line-height: 1.6; }
+
+  .intervention .actions { margin-top: 8px; }
+
+  .intervention .dismiss {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-right: 6px;
+  }
+
+  .intervention .dismiss:hover { background: var(--accent); color: white; }
+  .intervention .dismiss.chosen { background: var(--accent); color: white; }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Quick-check block after each paragraph */
+  .quick-check {
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin: 0 0 36px;
+  }
+
+  .quick-check .qc-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .scale-row { margin-bottom: 12px; }
+  .scale-row .scale-label { display: block; font-size: 13px; margin-bottom: 6px; }
+  .scale { display: flex; gap: 6px; max-width: 320px; }
+  .scale #setup-modal label, .scale label {
+    flex: 1; text-align: center; border: 1px solid var(--line);
+    border-radius: 4px; padding: 5px 0; font-size: 13px; cursor: pointer;
+  }
+  .scale input { display: none; }
+  .scale label:has(input:checked) { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .scale-endpoints {
+    display: flex;
+    justify-content: space-between;
+    max-width: 320px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .quiz-row .q-text { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+  .quiz-options label {
+    display: block; padding: 5px 10px; border: 1px solid var(--line);
+    border-radius: 4px; margin-bottom: 5px; font-size: 13px; cursor: pointer;
+  }
+  .quiz-options label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+
+  /* Status bar */
+  #status-panel {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--ink); color: #fff;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    font-size: 12px; padding: 10px 20px;
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap; z-index: 50;
+  }
+  #status-panel .stat { display: flex; flex-direction: column; }
+  #status-panel .stat span:first-child { color: #b9b5ab; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  #status-panel .stat span:last-child { font-size: 14px; font-weight: bold; }
+  #status-panel button {
+    margin-left: auto; background: var(--accent); color: #fff; border: none;
+    padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  #status-panel button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Finish overlay */
+  #finish-overlay {
+    position: fixed; inset: 0; background: rgba(43,42,40,0.55);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  #finish-overlay.show { display: flex; }
+  .panel { background: var(--panel); max-width: 480px; width: 92%; border-radius: 8px; padding: 28px 32px; text-align: center; }
+  .panel h2 { margin-top: 0; font-family: Georgia, serif; }
+  #download-link a {
+    display: inline-block; margin-top: 14px; background: var(--accent); color: #fff;
+    padding: 10px 20px; border-radius: 4px; text-decoration: none; font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Smart Reading Tracker — Dynamic Reading Session</h1>
+  <p>Read the passage below at your normal pace. Keep your mouse on the screen as you read.
+  After each paragraph, a short check appears — answer it before moving to the next paragraph.</p>
+  
+  <div id="setup-modal">
+    <h2>Participant Registration</h2>
+    <form id="registration-form">
+        <div class="form-group">
+          <label for="participant-id">Participant ID (e.g., P01):</label>
+          <input type="text" id="participant-id" required placeholder="Enter any ID">
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" min="15" max="99" required placeholder="e.g., 20">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender:</label>
+          <select id="gender" required>
+              <option value="">--Select--</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="study-details">Branch / Major / Course:</label>
+          <select id="study-details" required>
+              <option value="">--Select Branch--</option>
+              <option value="BTech CSE">BTech CSE</option>
+              <option value="BTech ECE">BTech ECE</option>
+              <option value="BTech Mechanical">BTech Mechanical</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="region">Region / State:</label>
+          <select id="region" required>
+              <option value="">--Select Region--</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="primary-language">Primary Language(Mother Tongue):</label>
+          <select id="primary-language" required>
+              <option value="">--Select Language--</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Kannada">Kannada</option>
+              <option value="Malayalam">Malayalam</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Telugu">Telugu</option>
+              <option value="Other">Other</option>
+          </select>
+        </div>
+        <button type="submit">Start Reading Session</button>
+    </form>
+  </div>
+</header>
+
+<div id="experiment-container">
+  <main>
+    <div class="doc-title">Modern AI Paradigms: Core Concepts, Language Models, and Reinforcement Learning</div>
+    <div id="reading-container"></div>
+  </main>
+
+  <div id="status-panel">
+    <div class="stat"><span>Current paragraph</span><span id="stat-para">—</span></div>
+    <div class="stat"><span>Dwell time (s)</span><span id="stat-dwell">0</span></div>
+    <div class="stat"><span>Reread count</span><span id="stat-reread">0</span></div>
+    <div class="stat"><span>Struggle score</span><span id="stat-struggle">0.00</span></div>
+    <button id="finish-btn" disabled>Finish & download data</button>
+  </div>
+</div>
+
+<div id="finish-overlay">
+  <div class="panel">
+    <h2>Thanks!</h2>
+    <p>Your session data has been prepared.</p>
+    <div id="download-link"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // =====================================================================
+  // CONTENT — Paragraphs and quiz questions. 
+  // Interventions are generated dynamically by FastAPI now!
+  // =====================================================================
+  const PARAGRAPHS = [
+    {
+      text: "Artificial Intelligence (AI) has a rich history and a rapidly expanding footprint. The term 'Artificial Intelligence' itself was first mentioned as early as 1956! Today, AI can beat world chess champions, Go champions, and even video game champions. Beyond gaming, there is some AI that can tell stories, create music, or even paint. According to industry experts, artificial intelligence will be incorporated into nearly all work and industries by the year 2030.",
+      words: 76,
+      quiz: {
+        question: "According to the text, by which year do experts predict AI will be incorporated into nearly all industries?",
+        options: ["1956", "2024", "2030", "2050"],
+        answer: 2
+      }
+    },
+    {
+      text: "Machine learning, or artificial intelligence (AI), is a paradigm of computing in which the algorithm 'learns' from the top down rather than being designed from the bottom up. The top-down approach is achieved by letting the algorithm try solutions, rewarding it for good behaviour, and penalizing it for bad behaviour — a primitive form of 'learning.' Ideally, the algorithm becomes capable of correctly identifying the content of unseen and unlabelled pictures. Because the algorithm is not designed to carry out steps known to solve the problem, it often doesn't — and even when it does, the reason it makes any particular decision is elusive, underscoring the thorny problem of AI safety.",
+      words: 112,
+      quiz: {
+        question: "Why does machine learning present a challenging or 'thorny' problem for AI safety?",
+        options: ["It cannot correctly process unseen or unlabelled images.", "It relies strictly on rigid bottom-up software design frameworks.", "The inner mathematical reasons behind its specific decisions are elusive and hard to trace.", "It is incapable of learning from performance penalties."],
+        answer: 2
+      }
+    },
+    {
+      text: "Large language models (LLMs) are a category of deep learning models trained on immense amounts of data, making them capable of understanding and generating natural language and other types of content to perform a wide range of tasks. LLMs are built on a type of neural network architecture called a transformer which excels at handling sequences of words and capturing patterns in text. LLMs work as giant statistical prediction machines that repeatedly predict the next word in a sequence. They learn patterns in their text and generate language that follows those patterns. LLMs represent a major leap in how humans interact with technology because they are the first AI system that can handle unstructured human language at scale, allowing for natural communication with machines. Where traditional search engines and other programmed systems used algorithms to match keywords, LLMs capture deeper context, nuance and reasoning. LLMs, once trained, can adapt to many applications that involve interpreting text, like summarizing an article, debugging code or drafting a legal clause. When given agentic capabilities, LLMs can perform, with varying degrees of autonomy, various tasks that would otherwise be performed by humans.",
+      words: 191,
+      quiz: {
+        question: "What structural capability allows LLMs to outperform traditional keyword-matching search engines?",
+        options: ["They execute processing cycles faster.", "They capture deep contextual meaning, linguistic nuance, and reasoning structures.", "They avoid using neural networks.", "They store pre-written conversational template scripts."],
+        answer: 1
+      }
+    },
+    {
+      text: "Physical AI refers to artificial intelligence systems that operate in and interact with the physical world, rather than existing only in software or digital environments. Physical AI typically involves the combination of AI models with sensors, actuators and other control systems that allow models to act upon real-world environments, taking models from the realm of bits to the realm of atoms. With AI, advanced physical systems can now perceive the environment, reason with the power of a large language model (LLM), act accordingly, and then learn from the outcome of that action. In contrast, robotic AI agents equipped with general understanding from LLMs have a limited but still powerful 'common sense' about the world. These models can be paired with reinforcement learning techniques in high-performance hybrid architectures so that robots can possess both general knowledge and a specialized understanding of a specific use case.",
+      words: 153,
+      quiz: {
+        question: "According to the text, what does pairing an LLM with reinforcement learning allow a robot to possess?",
+        options: ["Infinite battery life and memory storage configurations.", "Both broad general world knowledge and a specialized functional skill set.", "A complete shift from hardware components to software applications.", "An automated sequence that skips sensor readings entirely."],
+        answer: 1
+      }
+    },
+    {
+      text: "Retrieval-Augmented Generation (RAG) is a technique that gives a Large Language Model (LLM) access to outside information to make its answers more accurate. First, a business's documents are split into smaller text chunks and converted into math formulas called vector embeddings. These embeddings capture the core meaning of the text and are saved in a vector database. When a user asks a question, the system searches this database for the closest matching text chunks using mathematical formulas like Cosine Similarity. Finally, the system merges the user's question with these retrieved facts and feeds them into the LLM, allowing the model to write a highly accurate answer based on real data instead of guessing.",
+      words: 114,
+      quiz: {
+        question: "How does a RAG pipeline ensure an LLM writes an accurate response instead of guessing?",
+        options: ["By changing the source programming language of the framework.", "By forcing the system to random-search online engines.", "By retrieving matching text chunks from an embedding database and feeding those verified facts directly into the model context.", "By limiting the user's prompt window query size."],
+        answer: 2
+      }
+    },
+    {
+      text: "Working of Reinforcement Learning: The agent interacts iteratively with its environment in a feedback loop. The agent observes the current state of the environment. It chooses and performs an action based on its policy. The environment responds by transitioning to a new state and providing a reward (or penalty). The agent updates its knowledge (policy, value function) based on the reward received and the new state. This cycle repeats with the agent balancing exploration (trying new actions) and exploitation (using known good actions) to maximize the cumulative reward over time. This process is mathematically framed as a Markov Decision Process (MDP) where future states depend only on the current state and action, not on the prior sequence of events.",
+      words: 122,
+      quiz: {
+        question: "What core independence rule defines a Markov Decision Process (MDP)?",
+        options: ["Future outcomes are independent of the current state or choice.", "Future states depend strictly on the current state-action pair, ignoring historical paths.", "The agent must prioritize exploration over exploitation in every loop.", "Rewards cannot be calculated using numerical parameters."],
+        answer: 1
+      }
+    }
+  ];
+
+  // =====================================================================
+  // CONFIG
+  // =====================================================================
+  const IDLE_THRESHOLD_MS = 1500;
+  const STRUGGLE_THRESHOLD = 0.35;
+  const SCROLL_REREAD_PX = 50;
+  const BACKTRACK_PX = 30;
+  const FEATURE_UPDATE_MS = 1000;
+
+  const ARMS = ["control", "A_definition", "B_summary", "C_rephrase", "D_analogy"];
+  function pickArm() {
+    return ARMS[Math.floor(Math.random() * ARMS.length)];
+  }
+
+  // =====================================================================
+  // BUILD DOM
+  // =====================================================================
+  const container = document.getElementById("reading-container");
+  PARAGRAPHS.forEach((p, i) => {
+    const para = document.createElement("p");
+    para.className = "reading-para";
+    para.id = "para-" + i;
+    para.dataset.words = p.words;
+    para.textContent = p.text.replace(/\s+/g, " ").trim();
+    container.appendChild(para);
+
+    const interv = document.createElement("div");
+    interv.className = "intervention";
+    interv.id = "intervention-" + i;
+    interv.innerHTML = `
+      <div class="label"></div>
+      <div class="content"></div>
+      <div class="actions">
+        <button class="dismiss" data-response="helpful">This helped</button>
+        <button class="dismiss" data-response="not_helpful">Not helpful</button>
+      </div>`;
+    container.appendChild(interv);
+
+    const check = document.createElement("div");
+    check.className = "quick-check";
+    check.id = "check-" + i;
+    check.innerHTML = `
+      <div class="qc-title">Quick check — paragraph ${i + 1}</div>
+      <div class="scale-row">
+        <span class="scale-label">How difficult was this paragraph to understand?</span>
+        <div class="scale">
+          ${[1,2,3,4,5].map(v => `<label><input type="radio" name="diff-${i}" value="${v}"><span>${v}</span></label>`).join("")}
+        </div>
+        <div class="scale-endpoints">
+          <span>1 = Very easy</span>
+          <span>5 = Very difficult</span>
+        </div>
+      </div>
+      <div class="quiz-row">
+        <div class="q-text">${p.quiz.question}</div>
+        <div class="quiz-options">
+          ${p.quiz.options.map((optionText, oi) => `
+            <label><input type="radio" name="quiz-${i}" value="${oi}"> ${optionText}</label>
+          `).join("")}
+        </div>
+      </div>`;
+    container.appendChild(check);
+  });
+
+  // =====================================================================
+  // STATE
+  // =====================================================================
+  const rawEvents = [];
+  const paraStats = {};
+  const interventionLog = {}; 
+  
+  let sessionId = null;
+  let participantDemographics = {};
+
+  const paragraphs = Array.from(document.querySelectorAll(".reading-para"));
+  paragraphs.forEach((el, i) => {
+    paraStats[i] = {
+      wordCount: parseInt(el.dataset.words, 10),
+      dwellMs: 0,
+      lastEnterTime: null,
+      rereadCount: 0,
+      backtrackCount: 0,
+      cursorStops: 0,
+      mouseSpeeds: [],
+    };
+  });
+
+  let mouseX = 0, mouseY = 0, lastMouseTime = Date.now();
+  let idleTimer = null;
+  let currentParaId = null;
+  let lastScrollY = window.scrollY;
+
+  // =====================================================================
+  // POSITION MAPPING
+  // =====================================================================
+  function getParaBounds(i) {
+    const el = paragraphs[i];
+    const top = el.offsetTop;
+    return { top, bottom: top + el.offsetHeight };
+  }
+
+  function getCurrentParagraph() {
+    const viewportMid = window.scrollY + window.innerHeight / 2;
+    for (let i = 0; i < paragraphs.length; i++) {
+      const { top, bottom } = getParaBounds(i);
+      if (viewportMid >= top && viewportMid < bottom) return i;
+    }
+    return null;
+  }
+
+  function logEvent(type, extra) {
+    rawEvents.push(Object.assign({
+      session_id: sessionId,
+      event_type: type,
+      paragraph_id: currentParaId,
+      timestamp: new Date().toISOString(),
+      scroll_y: window.scrollY,
+    }, extra));
+  }
+
+  function setActiveParagraph(newId) {
+    if (newId === currentParaId) return;
+    if (currentParaId !== null && paraStats[currentParaId].lastEnterTime !== null) {
+      const stats = paraStats[currentParaId];
+      stats.dwellMs += Date.now() - stats.lastEnterTime;
+      stats.lastEnterTime = null;
+      paragraphs[currentParaId].classList.remove("active");
+    }
+    currentParaId = newId;
+    if (currentParaId !== null) {
+      paraStats[currentParaId].lastEnterTime = Date.now();
+      paragraphs[currentParaId].classList.add("active");
+    }
+  }
+
+  // =====================================================================
+  // SESSION CONTROLS
+  // =====================================================================
+  window.startSession = function(event) {
+    event.preventDefault(); 
+    
+    sessionId = document.getElementById('participant-id').value.trim();
+    participantDemographics = {
+      age: document.getElementById('age').value,
+      gender: document.getElementById('gender').value,
+      study_details: document.getElementById('study-details').value,
+      region: document.getElementById('region').value,
+      primary_language: document.getElementById('primary-language').value
+    };
+
+    document.getElementById('setup-modal').style.display = 'none';
+    document.getElementById('experiment-container').style.display = 'block';
+
+    setActiveParagraph(getCurrentParagraph() || 0);
+    logEvent("session_started", participantDemographics);
+  };
+
+  document.getElementById("registration-form").addEventListener("submit", window.startSession);
+
+  // =====================================================================
+  // TRACKING LISTENERS
+  // =====================================================================
+  document.addEventListener("mousemove", (e) => {
+    if (!sessionId) return;
+    const now = Date.now();
+    const dt = (now - lastMouseTime) / 1000;
+    const dx = e.clientX - mouseX;
+    const dy = e.clientY - mouseY;
+
+    if (currentParaId !== null && dt > 0) {
+      paraStats[currentParaId].mouseSpeeds.push(Math.sqrt(dx*dx + dy*dy) / dt);
+      if (dx < -BACKTRACK_PX) paraStats[currentParaId].backtrackCount++;
+    }
+
+    mouseX = e.clientX; mouseY = e.clientY; lastMouseTime = now;
+    logEvent("mousemove", { mouse_x: mouseX, mouse_y: mouseY });
+
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (currentParaId !== null) {
+        paraStats[currentParaId].cursorStops++;
+        logEvent("idle", { mouse_x: mouseX, mouse_y: mouseY });
+      }
+    }, IDLE_THRESHOLD_MS);
+  });
+
+  document.addEventListener("scroll", () => {
+    if (!sessionId) return;
+    const newScrollY = window.scrollY;
+
+    if (currentParaId !== null) {
+      const { top } = getParaBounds(currentParaId);
+      if (newScrollY < lastScrollY && (lastScrollY - newScrollY) > SCROLL_REREAD_PX && newScrollY <= top) {
+        paraStats[currentParaId].rereadCount++;
+      }
+    }
+
+    lastScrollY = newScrollY;
+    logEvent("scroll", { mouse_x: mouseX, mouse_y: mouseY });
+
+    const newPara = getCurrentParagraph();
+    if (newPara !== null) setActiveParagraph(newPara);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!sessionId) return;
+    logEvent(document.hidden ? "tab_hidden" : "tab_visible", {});
+  });
+
+  // =====================================================================
+  // STRUGGLE MATH + SHOW INTERVENTIONS (FASTAPI LIVE VERSION)
+  // =====================================================================
+  function avg(arr) { return arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : 0; }
+
+  function computeFeatures(paraId) {
+    const s = paraStats[paraId];
+    const dwellSec = (s.dwellMs + (s.lastEnterTime ? Date.now() - s.lastEnterTime : 0)) / 1000;
+    const wpm = dwellSec > 0 ? (s.wordCount / dwellSec) * 60 : 999;
+
+    const dwellTerm = Math.min(dwellSec / 40, 1);
+    const rereadTerm = Math.min(s.rereadCount / 3, 1);
+    const backtrackTerm = Math.min(s.backtrackCount / 5, 1);
+    const stopTerm = Math.min(s.cursorStops / 4, 1);
+    const speedTerm = Math.max(0, 1 - wpm / 180);
+
+    const score = 0.30*dwellTerm + 0.25*rereadTerm + 0.20*backtrackTerm + 0.15*stopTerm + 0.10*speedTerm;
+    return { score: Math.min(score, 1), dwellSec, wpm };
+  }
+
+  function classifyStruggleType(paraId) {
+    const s = paraStats[paraId];
+    if (s.rereadCount >= 1) return "reread";
+    if (s.backtrackCount >= 2) return "backtrack";
+    if (s.cursorStops >= 1) return "slow_reading";
+    return "none";
+  }
+
+  // Live Async FastAPI Hook
+  async function showIntervention(paraId, arm) {
+    if (arm === "control") return; 
+    const el = document.getElementById("intervention-" + paraId);
+    
+    const labelMapping = {
+      "A_definition": "AI Vocabulary Definition Help",
+      "B_summary": "AI Summary Highlight",
+      "C_rephrase": "AI Simple Rephrase Assist",
+      "D_analogy": "AI Relatable Analogy Concept"
+    };
+
+    el.querySelector(".label").textContent = labelMapping[arm] || "AI Hint";
+    el.querySelector(".content").textContent = "AI is thinking..."; 
+    el.classList.add("show");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/generate-intervention", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paragraph_text: PARAGRAPHS[paraId].text,
+          arm: arm
+        })
+      });
+
+      if (!response.ok) throw new Error("Backend offline");
+      const data = await response.json();
+      el.querySelector(".content").textContent = data.support_text;
+
+    } catch (error) {
+      console.error("Live AI fallback triggered:", error);
+      el.querySelector(".content").textContent = "AI support is currently offline. Please review paragraph checks below.";
+    }
+  }
+
+  document.querySelectorAll(".intervention .dismiss").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const wrap = e.target.closest(".intervention");
+      const paraId = parseInt(wrap.id.split("-")[1], 10);
+      const response = e.target.dataset.response;
+      wrap.querySelectorAll(".dismiss").forEach(b => b.classList.remove("chosen"));
+      e.target.classList.add("chosen");
+      if (interventionLog[paraId]) {
+        interventionLog[paraId].accepted = response === "helpful" ? 1 : 0;
+      }
+      logEvent("intervention_response", { arm: interventionLog[paraId] ? interventionLog[paraId].arm : null, response });
+    });
+  });
+
+  setInterval(() => {
+    if (!sessionId || currentParaId === null) return;
+    const { score, dwellSec } = computeFeatures(currentParaId);
+
+    document.getElementById("stat-para").textContent = "P" + (currentParaId + 1);
+    document.getElementById("stat-dwell").textContent = dwellSec.toFixed(1);
+    document.getElementById("stat-reread").textContent = paraStats[currentParaId].rereadCount;
+    document.getElementById("stat-struggle").textContent = score.toFixed(2);
+
+    if (score >= STRUGGLE_THRESHOLD && !interventionLog[currentParaId]) {
+      const arm = pickArm();
+      const struggleType = classifyStruggleType(currentParaId);
+      interventionLog[currentParaId] = { arm: arm, accepted: null, struggle_type: struggleType };
+      showIntervention(currentParaId, arm);
+      logEvent("intervention_assigned", { arm: arm, struggle_type: struggleType });
+    }
+  }, FEATURE_UPDATE_MS);
+
+  // Dynamic global completeness tracking validator
+  document.addEventListener("change", () => {
+    let allAnswered = true;
+    for (let i = 0; i < PARAGRAPHS.length; i++) {
+      const diffAnswered = document.querySelector(`input[name="diff-${i}"]:checked`);
+      const quizAnswered = document.querySelector(`input[name="quiz-${i}"]:checked`);
+      if (!diffAnswered || !quizAnswered) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById("finish-btn").disabled = !allAnswered;
+  });
+
+  // =====================================================================
+  // DATA DOWNLOAD OUTPUT MAPPING
+  // =====================================================================
+  document.getElementById("finish-btn").addEventListener("click", () => {
+    for (let i = 0; i < PARAGRAPHS.length; i++) {
+      if (interventionLog[i] && interventionLog[i].accepted === null && interventionLog[i].arm !== "control") {
+        alert(`Please provide feedback on the AI help banner for Paragraph ${i + 1} before downloading data!`);
+        document.getElementById("intervention-" + i).scrollIntoView({ behavior: 'smooth' });
+        return; 
+      }
+    }
+
+    setActiveParagraph(null);
+
+    const paragraphEvents = [];
+    const quizResults = [];
+    const interventionRows = [];
+
+    paragraphs.forEach((el, i) => {
+      const features = computeFeatures(i);
+      const s = paraStats[i];
+
+      paragraphEvents.push({
+        session_id: sessionId,
+        paragraph_id: i,
+        dwell_time_s: Math.round(features.dwellSec * 10) / 10,
+        reread_count: s.rereadCount,
+        backtrack_count: s.backtrackCount,
+        cursor_stops: s.cursorStops,
+        avg_mouse_speed: Math.round(avg(s.mouseSpeeds) * 10) / 10,
+        reading_speed_wpm: Math.round(features.wpm * 10) / 10,
+        struggle_score: Math.round(features.score * 1000) / 1000,
+        struggle_type: classifyStruggleType(i),
+      });
+
+      const diffInput = document.querySelector('input[name="diff-' + i + '"]:checked');
+      const quizInput = document.querySelector('input[name="quiz-' + i + '"]:checked');
+      
+      let quizCorrect = null;
+      if (quizInput) {
+        const selectedIndex = parseInt(quizInput.value, 10);
+        quizCorrect = (selectedIndex === PARAGRAPHS[i].quiz.answer) ? 1 : 0;
+      }
+
+      quizResults.push({
+        session_id: sessionId,
+        paragraph_id: i,
+        self_report_difficulty: diffInput ? parseInt(diffInput.value, 10) : null,
+        quiz_correct: quizCorrect,
+      });
+
+      if (interventionLog[i]) {
+        // Dynamic version grabs the content currently rendered inside the banner viewport
+        const loadedText = document.getElementById("intervention-" + i).querySelector(".content").textContent;
+        interventionRows.push({
+          session_id: sessionId,
+          paragraph_id: i,
+          struggle_type: interventionLog[i].struggle_type,
+          arm: interventionLog[i].arm,
+          accepted: interventionLog[i].accepted,
+          follow_up_correct: quizCorrect, 
+          generated_content: loadedText
+        });
+      }
+    });
+
+    const sessionData = {
+      session_id: sessionId,
+      age: participantDemographics.age || '',
+      gender: participantDemographics.gender || '',
+      study_details: participantDemographics.study_details || '',
+      region: participantDemographics.region || '',
+      primary_language: participantDemographics.primary_language || '',
+      raw_events: rawEvents,
+      paragraph_events: paragraphEvents,
+      quiz_results: quizResults,
+      intervention_log: interventionRows,
+    };
+
+    const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const linkDiv = document.getElementById("download-link");
+    linkDiv.innerHTML = '<a href="' + url + '" download="' + sessionId + '_dynamic.json">Download ' + sessionId + '_dynamic.json</a>';
+    document.getElementById("finish-overlay").classList.add("show");
+  });
+})();
+</script>
+
+</body>
+</html>
